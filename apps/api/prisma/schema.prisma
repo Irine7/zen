@@ -1,0 +1,58 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String?
+  zenPoints  Int      @default(0)
+  
+  // Связи
+  bonsais    Bonsai[]
+  habits     Habit[]
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Habit {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  
+  // Связь с пользователем
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // Связь 1-к-1 с Bonsai (отношение определяется в модели Bonsai)
+  bonsai      Bonsai?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Bonsai {
+  id             String   @id @default(uuid())
+  type           String
+  level          Int      @default(1)
+  
+  // Связь с пользователем
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+
+  // Связь 1-к-1 с Habit
+  // @unique гарантирует, что к одной привычке нельзя привязать два дерева
+  habitId        String   @unique
+  habit          Habit    @relation(fields: [habitId], references: [id])
+
+  lastWateredAt  DateTime @default(now())
+  createdAt      DateTime @default(now())
+}

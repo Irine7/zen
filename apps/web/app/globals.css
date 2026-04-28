@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme {
+  --color-zen-bg: #0a0a0b;
+  --color-zen-card: rgba(24, 24, 27, 0.4); /* zinc-900/40 */
+  --color-zen-border: rgba(39, 39, 42, 0.5); /* zinc-800/50 */
+  --color-zen-emerald: #10b981;
+  --color-zen-emerald-glow: rgba(16, 185, 129, 0.2);
+}
+
+@utility zen-layout {
+  @apply min-h-screen bg-zen-bg text-zinc-100 font-sans selection:bg-zen-emerald/30;
+}
+
+@utility zen-container {
+  @apply relative z-10 max-w-7xl mx-auto px-6 py-12;
+}
+
+@utility glass-card {
+  @apply relative rounded-[32px] bg-zen-card border border-zen-border backdrop-blur-xl overflow-hidden transition-all duration-500;
+}
+
+@utility glass-card-hover {
+  @apply hover:border-zen-emerald/30;
+}
+
+@utility glass-card-dashed {
+  @apply h-[440px] rounded-[32px] border-2 border-dashed border-zinc-800 flex flex-col items-center justify-center gap-4 text-zinc-500 hover:border-zen-emerald/50 hover:text-zen-emerald transition-all;
+}
+
+@utility btn-base {
+  @apply rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 font-semibold text-sm cursor-pointer;
+}
+
+@utility btn-primary {
+  @apply btn-base h-12 bg-white text-black hover:bg-zen-emerald;
+}
+
+@utility btn-secondary {
+  @apply btn-base h-12 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white;
+}
+
+@utility btn-icon {
+  @apply btn-base w-12 h-12 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white;
+}
+
+@utility badge {
+  @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter;
+}
+
+@utility badge-healthy {
+  @apply bg-zen-emerald/10 text-zen-emerald;
+}
+
+@utility badge-warning {
+  @apply bg-amber-500/10 text-amber-500;
+}
+
+@utility bg-glow-container {
+  @apply fixed inset-0 overflow-hidden pointer-events-none;
+}
+
+@utility bg-glow-spot {
+  @apply absolute rounded-full blur-[120px];
+}
+
+@utility progress-bg {
+  @apply w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden;
+}
+
+@utility progress-fill {
+  @apply h-full bg-zen-emerald transition-all duration-1000;
+}
+
+/* --- Zen Header --- */
+@utility zen-header-title {
+  @apply text-4xl font-light tracking-tight text-white;
+}
+
+@utility zen-header-subtitle {
+  @apply text-zinc-500 text-sm;
+}
+
+@utility zen-points-value {
+  @apply text-xl font-medium text-emerald-400;
+}
+
+@utility zen-points-label {
+  @apply text-xs text-zinc-500 uppercase tracking-widest;
+}
+
+/* --- Zen Card --- */
+@utility zen-card {
+  @apply glass-card glass-card-hover h-[440px];
+}
+
+@utility zen-card-title {
+  @apply text-xl font-medium text-white;
+}
+
+@utility zen-card-level {
+  @apply text-xs font-medium text-emerald-500 uppercase tracking-widest;
+}
+
+@utility zen-card-image-container {
+  @apply absolute inset-x-0 top-0 h-[280px] flex items-center justify-center p-8;
+}
+
+@utility zen-card-image-glow {
+  @apply absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700;
+}
+
+@utility zen-card-content {
+  @apply absolute inset-x-0 bottom-0 p-8 flex flex-col gap-4;
+}

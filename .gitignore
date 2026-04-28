@@ -1,0 +1,76 @@
+# --- Dependencies ---
+node_modules/
+.pnp
+.pnp.js
+jspm_packages/
+
+# --- Build Outputs ---
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+*.next
+
+# --- Environment Variables ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.local
+
+# --- Logs ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# --- Testing & Coverage ---
+coverage/
+.nyc_output/
+junit.xml
+reports/
+*.lcov
+
+# --- OS Specific ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --- IDEs & Editors ---
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# --- Prisma ---
+**/prisma/*.db
+**/prisma/*.db-journal
+**/src/generated/prisma/
+
+# --- Misc ---
+.vercel
+.netlify
+.serverless
+.cache/
+.eslintcache
+.stylelintcache
+.prettiercache
+.node_repl_history
+package-lock.json
+yarn.lock

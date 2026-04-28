@@ -1,0 +1,33 @@
+{
+	"name": "@zen/api",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "tsx --env-file=.env src/index.ts"
+	},
+	"keywords": [],
+	"author": "Irine7 (isemichasova@gmail.com)",
+	"license": "ISC",
+	"dependencies": {
+		"@apollo/server": "^5.5.0",
+		"@neondatabase/serverless": "^0.10.4",
+		"@prisma/client": "^6.2.1",
+		"@types/ws": "^8.18.1",
+		"@zen/shared-types": "workspace:^",
+		"graphql": "^16.13.2",
+		"reflect-metadata": "^0.2.2",
+		"tsx": "^4.21.0",
+		"type-graphql": "2.0.0-rc.3",
+		"ws": "^8.20.0"
+	},
+	"devDependencies": {
+		"@types/node": "^25.5.2",
+		"dotenv": "^17.4.1",
+		"prisma": "^6.2.1",
+		"ts-node": "^10.9.2",
+		"typescript": "^6.0.2"
+	}
+}
