@@ -1,9 +1,11 @@
 import { IBonsai } from '@zen/shared-types';
 
 export interface ExtendedBonsai extends Omit<IBonsai, 'lastWateredAt' | 'createdAt'> {
+	__typename: "Bonsai";
 	lastWateredAt: string;
 	createdAt: string;
 	user: {
+		__typename: "User";
 		id: string;
 		zenPoints: number;
 	};

@@ -1,19 +1,34 @@
 import { useMutation } from "@apollo/client/react";
+import { DocumentNode, OperationVariables } from '@apollo/client';
 import { WATER_BONSAI, LEVEL_UP_BONSAI, DELETE_BONSAI, CREATE_BONSAI } from "@/src/graphql/queries";
 import { handleBonsaiResponse } from "@/src/utils/bonsai-errors";
 import { DeleteBonsaiData, ExtendedBonsai, CreateBonsaiData } from "@/src/types/garden";
 import { gql } from '@apollo/client';
 
+/**
+ * TData — это тип того, что вернет сервер (например, { waterBonsai: Bonsai })
+ * TVariables — это тип аргументов (например, { id: string })
+ */
+
 // Общие настройки для всех мутаций
-const useBonsaiMutation = (mutation: any, options = {}) => {
-	return useMutation(mutation, {
-		onError: (err) => alert(`Ошибка: ${err.message}`),
-		...options
-	});
+type UseMutationOptions<TData, TVariables extends OperationVariables> = 
+  Parameters<typeof useMutation<TData, TVariables>>[1];
+
+const useBonsaiMutation = <TData = any, TVariables extends OperationVariables = OperationVariables>(
+  mutation: DocumentNode,
+  options?: UseMutationOptions<TData, TVariables>
+) => {
+  return useMutation<TData, TVariables>(mutation, {
+    onError: (err) => console.error(err.message),
+    ...options,
+  });
 };
 
 export function useBonsaiActions(bonsai?: ExtendedBonsai) {
-	const [waterMutation, { loading: isWatering }] = useBonsaiMutation(WATER_BONSAI);
+	const [waterMutation, { loading: isWatering }] = useBonsaiMutation<
+		{ waterBonsai: ExtendedBonsai; }, // Что ждем в ответе
+		{ id: string; } // Какие переменные нужны 
+	>(WATER_BONSAI);
 	const [levelUpMutation, { loading: isLevelingUp }] = useBonsaiMutation(LEVEL_UP_BONSAI);
 	const [createMutation, { loading: isCreating }] = useBonsaiMutation(CREATE_BONSAI, {
 		update(cache: any, { data }: { data?: CreateBonsaiData; }) {
@@ -61,13 +76,11 @@ export function useBonsaiActions(bonsai?: ExtendedBonsai) {
 				// Оптимистичный ответ: мы притворяемся, что сервер уже ответил успешно
 				optimisticResponse: {
 					waterBonsai: {
-						__typename: "Bonsai", // Указываем тип для кэша
-						id: bonsai.id,
-						lastWateredAt: new Date().toISOString(),
+						...bonsai, // Копируем ВСЕ поля из текущего дерева (createdAt, habit и т.д.)
+						lastWateredAt: new Date().toISOString(), // Перезаписываем дату
 						user: {
-							__typename: "User",
-							id: bonsai.user.id,
-							zenPoints: bonsai.user.zenPoints + 5
+							...bonsai.user, // Копируем данные пользователя
+							zenPoints: bonsai.user.zenPoints + 5 // Добавляем очки пользователю
 						},
 					}
 				}
