@@ -4,19 +4,21 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { buildSchema } from "type-graphql";
 import { BonsaiResolver } from "@/modules/bonsai/bonsai.resolver";
+import { UserResolver } from "@/modules/user/user.resolver";
+import { HabitResolver } from './modules/habit/habit.resolver';
 
 async function bootstrap() {
-	// 1. Строим схему из наших резолверов
+	// Строим схему из наших резолверов
 	const schema = await buildSchema({
-		resolvers: [BonsaiResolver],
+		resolvers: [BonsaiResolver, HabitResolver, UserResolver],
 	});
 
-	// 2. Создаем сервер Apollo
+	// Создаем сервер Apollo
 	const server = new ApolloServer({
 		schema,
 	});
 
-	// 3. Запускаем сервер
+	// Запускаем сервер
 	const url = await startStandaloneServer(server, {
 		listen: { port: 4000 },
 	});

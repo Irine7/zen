@@ -16,7 +16,7 @@ interface BonsaiCardProps {
 }
 
 export const BonsaiCard = memo(({ bonsai, index }: BonsaiCardProps) => {
-	const { isHealthy, isDead, status, hydration, hydrationColor } = useBonsaiStatus(bonsai);
+	const { isHealthy, status, hydration, hydrationColor } = useBonsaiStatus(bonsai);
 
 	return (
 		<motion.div

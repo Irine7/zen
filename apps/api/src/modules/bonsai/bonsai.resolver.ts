@@ -63,11 +63,16 @@ export class BonsaiResolver {
 		const deadError = validateBonsaiAlive(result.lastWateredAt);
 		if (deadError) return deadError;
 
-		const updatedBonsai = await prisma.bonsai.update({
-			where: { id },
-			data: { lastWateredAt: new Date() }
-		}).catch((err: any) => BonsaiService.handleDbError(err, id));
-		return Object.assign(new Bonsai(), updatedBonsai);
+		return await prisma.$transaction(async (tx) => {
+			// Обновляем дату полива
+			const updatedBonsai = await tx.bonsai.update({
+				where: { id },
+				data: { lastWateredAt: new Date() }
+			});
+			// Начисляем пользователю очки
+			await UserService.addPoints(result.userId, 5, tx);
+			return Object.assign(new Bonsai(), updatedBonsai);
+		});
 	}
 
 	// Повышаем уровень дерева
