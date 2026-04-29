@@ -9,6 +9,10 @@ mutation CreateBonsai($input: CreateBonsaiInput!) {
 		level
 		lastWateredAt
 		createdAt
+		user {
+			id
+			zenPoints
+		}
 		habit {
 			title
 		}

@@ -4,10 +4,10 @@ import { ANIMATIONS } from '@/src/constants/animations';
 import { useBonsaiActions } from '@/src/hooks/useBonsaiActions';
 
 export function PlantTreeButton() {
-	const { createBonsai, loading } = useBonsaiActions("");
+	const { createBonsai, loading } = useBonsaiActions();
 
 	const handleClick = async () => {
-		await createBonsai("PINE", "h1", "1");
+		await createBonsai("PINE", "l3", "1");
 	}
 
 	return (
