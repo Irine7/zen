@@ -90,3 +90,8 @@ query GetUserProfile($id: String!) {
 	}
 }
 `;
+
+export const bonsaiFragment = gql`
+  fragment NewBonsai on Bonsai {
+    id type level lastWateredAt user { id zenPoints }
+  }`;
