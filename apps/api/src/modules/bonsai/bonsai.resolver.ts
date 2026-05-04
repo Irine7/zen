@@ -1,4 +1,4 @@
-import { Resolver, Query, Arg, Mutation, FieldResolver, Root, createUnionType } from "type-graphql";
+import { Resolver, Query, Arg, Mutation, FieldResolver, Root, createUnionType, Ctx } from "type-graphql";
 import { Bonsai, CreateBonsaiInput } from './bonsai.entity';
 import { prisma } from "@/lib/prisma";
 import { BONSAI_RULES } from "@zen/shared-types";
@@ -9,6 +9,7 @@ import { BonsaiNotFoundError, BonsaiAlreadyDeadError } from "./errors";
 import { UserService } from '../user/user.service';
 import { HabitService } from '../habit/habit.service';
 import { BonsaiService } from './bonsai.service';
+import type { Context } from '@/types/context';
 
 // Создаем Union Type. Результат полива — это ЛИБО дерево, ЛИБО ошибка
 export const BonsaiResult = createUnionType({
@@ -95,8 +96,19 @@ export class BonsaiResolver {
 
 	// Создаем дерево
 	@Mutation(() => Bonsai)
-	async createBonsai(@Arg("input", () => CreateBonsaiInput) input: CreateBonsaiInput): Promise<Bonsai> {
-		return prisma.bonsai.create({ data: input });
+	async createBonsai(
+		@Arg("input") input: CreateBonsaiInput,
+		@Ctx() ctx: Context
+	): Promise<Bonsai> {
+		if (!ctx.userId) {
+			throw new Error("Вы не авторизованы!");
+		}
+		return prisma.bonsai.create({
+			data: {
+				...input,
+				userId: ctx.userId
+			}
+		});
 	}
 
 	// Удаляем дерево
