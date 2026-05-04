@@ -8,6 +8,8 @@ export class User {
 	@Field(() => String)
 	email!: string;
 
+	password!: string;
+
 	@Field(() => String, { nullable: true }) // Имя может быть пустым
 	name?: string | null;
 

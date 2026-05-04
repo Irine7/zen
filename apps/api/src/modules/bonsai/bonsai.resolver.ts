@@ -18,7 +18,6 @@ export const BonsaiResult = createUnionType({
 
 @Resolver(() => Bonsai)
 export class BonsaiResolver {
-
 	// Динамическое поле для статуса состояния дерева	
 	@FieldResolver(() => String)
 	status(@Root() bonsai: Bonsai): string {

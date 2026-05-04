@@ -2,11 +2,6 @@ import { ObjectType, Field, ID, Int, InputType } from "type-graphql";
 import { User } from '../user/user.entity';
 import { Habit } from '../habit/habit.entity';
 
-// @ObjectType() — помечает класс как GraphQL-объект
-// @Field() — помечает поле как GraphQL-поле
-// ObjectType — это то, что сервер отдает клиенту.
-// InputType — это то, что клиент присылает серверу.
-
 @ObjectType()
 export class Bonsai {
 	@Field(() => ID)
