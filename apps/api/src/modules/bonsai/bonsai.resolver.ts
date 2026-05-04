@@ -97,8 +97,8 @@ export class BonsaiResolver {
 	// Создаем дерево
 	@Mutation(() => Bonsai)
 	async createBonsai(
-		@Arg("input") input: CreateBonsaiInput,
-		@Ctx() ctx: Context
+		@Arg("input", () => CreateBonsaiInput) input: CreateBonsaiInput,
+		@Ctx() ctx: Context 
 	): Promise<Bonsai> {
 		if (!ctx.userId) {
 			throw new Error("Вы не авторизованы!");

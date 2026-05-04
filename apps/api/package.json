@@ -6,7 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "tsx --env-file=.env src/index.ts"
+		"dev": "tsx src/index.ts"
 	},
 	"keywords": [],
 	"author": "Irine7 (isemichasova@gmail.com)",

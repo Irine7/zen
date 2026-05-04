@@ -39,8 +39,5 @@ export class CreateBonsaiInput {
 	type!: string;
 
 	@Field(() => String)
-	userId!: string;
-
-	@Field(() => String)
 	habitId!: string;
 }
