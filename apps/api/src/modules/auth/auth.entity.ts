@@ -3,7 +3,7 @@ import { User } from "../user/user.entity";
 
 @ObjectType()
 export class AuthPayload {
-	@Field()
+	@Field(() => String)
 	token!: string;
 
 	@Field(() => User)

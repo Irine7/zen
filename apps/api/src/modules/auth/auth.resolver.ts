@@ -6,11 +6,12 @@ import { AuthPayload } from "./auth.entity";
 
 @Resolver()
 export class AuthResolver {
+	// Регистрируемся в системе
 	@Mutation(() => AuthPayload)
 	async signUp(
-		@Arg("email") email: string,
-		@Arg("password") password: string,
-		@Arg("name", { nullable: true }) name?: string,
+		@Arg("email", () => String) email: string,
+		@Arg("password", () => String) password: string,
+		@Arg("name", () => String, { nullable: true }) name?: string,
 	): Promise<AuthPayload> {
 		// Шифруем пароль
 		const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,11 +36,12 @@ export class AuthResolver {
 
 		return { token, user };
 	}
-	
+
+	// Входим в систему
 	@Mutation(() => AuthPayload)
 	async signIn(
-		@Arg("email") email: string,
-		@Arg("password") password: string,
+		@Arg("email", () => String) email: string,
+		@Arg("password", () => String) password: string,
 	): Promise<AuthPayload> {
 		const user = await prisma.user.findUnique({ where: { email } });
 		if (!user) throw new Error("Пользователь не найден")

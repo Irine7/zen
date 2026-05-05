@@ -4,7 +4,7 @@ import { useBonsaiActions } from '@/src/hooks/useBonsaiActions';
 import { useBonsaiStatus } from '@/src/hooks/useBonsaiStatus';
 
 export function BonsaiActions({ bonsai }: { bonsai: ExtendedBonsai; }) {
-	const { water, levelUp, deleteBonsai, loading } = useBonsaiActions(bonsai );
+	const { water, levelUp, deleteBonsai, loading } = useBonsaiActions(bonsai);
 	const { isDead } = useBonsaiStatus(bonsai);
 
 	return (

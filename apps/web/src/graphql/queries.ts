@@ -95,3 +95,28 @@ export const bonsaiFragment = gql`
   fragment NewBonsai on Bonsai {
     id type level lastWateredAt user { id zenPoints }
   }`;
+
+export const SIGN_UP = gql`
+  mutation SignUp($name: String!, $email: String!, $password: String!) {
+    signUp(name: $name, email: $email, password: $password) {
+      token
+      user {
+        id
+        email
+        name
+      }
+    }
+  }
+`;
+
+export const SIGN_IN = gql`
+mutation SignIn($email: String!, $password: String!) {
+	signIn(email: $email, password: $password) {
+		token
+		user {
+			id
+			email
+			name
+		}
+	}
+}`;
