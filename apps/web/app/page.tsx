@@ -10,7 +10,6 @@ import { PlantTreeButton } from '@/src/components/garden/PlantTreeButton';
 import { GET_USER_PROFILE } from '@/src/graphql/queries';
 import { UserProfileData } from '@/src/types/user';
 
-
 export default function ZenGardenPage() {
 	const { data, loading: gardenLoading, error: gardenError } = useQuery<GetGardenData>(GET_GARDEN);
 	const { data: userData, loading: userLoading, error: userError } = useQuery<UserProfileData>(GET_USER_PROFILE, {
