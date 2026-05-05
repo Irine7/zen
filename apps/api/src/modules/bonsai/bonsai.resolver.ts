@@ -50,8 +50,15 @@ export class BonsaiResolver {
 
 	// Получаем весь сад
 	@Query(() => [Bonsai])
-	async getGarden(): Promise<Bonsai[]> {
-		return prisma.bonsai.findMany();
+	async getGarden(@Ctx() ctx: Context): Promise<Bonsai[]> {
+		if (!ctx.userId) {
+			throw new Error("Пожалуйста, авторизуйтесь");
+		}
+		return prisma.bonsai.findMany({
+			where: {
+				userId: ctx.userId // Каждый видит только свой сад
+			}
+		});
 	}
 
 	// Поливаем дерево
@@ -98,7 +105,7 @@ export class BonsaiResolver {
 	@Mutation(() => Bonsai)
 	async createBonsai(
 		@Arg("input", () => CreateBonsaiInput) input: CreateBonsaiInput,
-		@Ctx() ctx: Context 
+		@Ctx() ctx: Context
 	): Promise<Bonsai> {
 		if (!ctx.userId) {
 			throw new Error("Вы не авторизованы!");

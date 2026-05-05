@@ -7,12 +7,13 @@ import jwt from "jsonwebtoken";
 import { BonsaiResolver } from "@/modules/bonsai/bonsai.resolver";
 import { UserResolver } from "@/modules/user/user.resolver";
 import { HabitResolver } from './modules/habit/habit.resolver';
+import { AuthResolver } from './modules/auth/auth.resolver';
 import type { Context } from './types/context';
 
 async function bootstrap() {
 	// Строим схему из наших резолверов
 	const schema = await buildSchema({
-		resolvers: [BonsaiResolver, HabitResolver, UserResolver],
+		resolvers: [BonsaiResolver, HabitResolver, UserResolver, AuthResolver],
 	});
 
 	// Создаем сервер Apollo
