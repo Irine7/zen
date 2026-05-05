@@ -6,17 +6,7 @@ import { BackgroundGlow } from '@/src/components/ui/BackgroundGlow';
 import { useMutation } from "@apollo/client/react";
 import { AUTH_TOKEN_KEY } from "@/constants/auth";
 import { SIGN_IN } from '@/src/graphql/queries';
-
-interface SignInData {
-	signIn: {
-		token: string;
-		user: {
-			id: string;
-			email: string;
-			name: string;
-		};
-	};
-}
+import { SignInData } from '@/src/types/auth';
 
 export default function LoginPage() {
 	const [email, setEmail] = useState('');

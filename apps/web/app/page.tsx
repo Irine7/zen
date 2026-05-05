@@ -8,13 +8,8 @@ import { GardenHeader } from '@/src/components/garden/GardenHeader';
 import { BackgroundGlow } from '@/src/components/ui/BackgroundGlow';
 import { PlantTreeButton } from '@/src/components/garden/PlantTreeButton';
 import { GET_USER_PROFILE } from '@/src/graphql/queries';
+import { UserProfileData } from '@/src/types/user';
 
-interface UserProfileData {
-	getUserProfile: {
-		id: string;
-		zenPoints: number;
-	};
-}
 
 export default function ZenGardenPage() {
 	const { data, loading: gardenLoading, error: gardenError } = useQuery<GetGardenData>(GET_GARDEN);
