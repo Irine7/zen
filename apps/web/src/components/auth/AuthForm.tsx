@@ -26,14 +26,18 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
 	const [authMutation, { loading, error }] = useMutation<SignInData | SignUpData>(mutation, {
 		onCompleted: (data) => {
 			let token = '';
+			let userId = '';
 
 			if ('signIn' in data) {
 				token = data.signIn.token;
+				userId = data.signIn.user.id;
 			} else if ('signUp' in data) {
 				token = data.signUp.token;
+				userId = data.signUp.user.id;
 			}
-			if (token) {
-				handleAuthSuccess(token);
+			
+			if (token && userId) {
+				handleAuthSuccess(token, userId);
 			}
 		},
 		onError: (err) => alert(`Ошибка: ${err.message}`)
