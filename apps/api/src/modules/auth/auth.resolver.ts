@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import cookie from "cookie";
+import * as cookie from "cookie";
 import { prisma } from "@/lib/prisma";
 import { Resolver, Mutation, Arg, Ctx } from "type-graphql";
 import type { Context } from "@/types/context";

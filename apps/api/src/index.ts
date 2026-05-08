@@ -1,7 +1,7 @@
 import "dotenv/config";
 import "reflect-metadata";
 import jwt from "jsonwebtoken";
-import cookie from "cookie";
+import * as cookie from "cookie";
 import { buildSchema } from "type-graphql";
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express4';
