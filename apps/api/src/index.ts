@@ -8,7 +8,6 @@ import { expressMiddleware } from '@as-integrations/express4';
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
-import { json } from 'body-parser';
 import { BonsaiResolver } from "@/modules/bonsai/bonsai.resolver";
 import { UserResolver } from "@/modules/user/user.resolver";
 import { HabitResolver } from './modules/habit/habit.resolver';
@@ -39,7 +38,7 @@ async function bootstrap() {
 			origin: ["http://localhost:3000"],
 			credentials: true,
 		}),
-		json(),
+		express.json(),
 		expressMiddleware(server, {
 			context: async ({ req, res }): Promise<Context> => {
 				// Берем заголовок Authorization (обычно он выглядит как "Bearer <token>")

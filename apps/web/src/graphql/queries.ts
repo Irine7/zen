@@ -82,7 +82,12 @@ export const GET_GARDEN = gql`
 	}
 `;
 
-export const GET_USER_PROFILE = gql`
+export const bonsaiFragment = gql`
+  fragment NewBonsai on Bonsai {
+    id type level lastWateredAt user { id zenPoints }
+  }`;
+
+	export const GET_USER_PROFILE = gql`
 query GetUserProfile($id: String!) {
 	getUserProfile(id: $id) {
 		id
@@ -90,11 +95,6 @@ query GetUserProfile($id: String!) {
 	}
 }
 `;
-
-export const bonsaiFragment = gql`
-  fragment NewBonsai on Bonsai {
-    id type level lastWateredAt user { id zenPoints }
-  }`;
 
 export const SIGN_UP = gql`
   mutation SignUp($name: String!, $email: String!, $password: String!) {
@@ -120,3 +120,13 @@ mutation SignIn($email: String!, $password: String!) {
 		}
 	}
 }`;
+
+export const GET_ME = gql`
+	query GetMe {
+		getMe {
+			id
+			email
+			name
+		}
+	}
+`;

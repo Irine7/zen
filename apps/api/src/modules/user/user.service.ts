@@ -19,6 +19,11 @@ export class UserService {
 		return client.user.update({
 			where: { id: userId },
 			data: { zenPoints: { increment: points } }
-		})
+		});
+	}
+
+	// Просто находит пользователя или возвращает null
+	static async getById(id: string): Promise<User | null> {
+		return prisma.user.findUnique({ where: { id } });
 	}
 }
