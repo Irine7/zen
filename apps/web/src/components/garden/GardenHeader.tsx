@@ -7,7 +7,7 @@ interface GardenHeaderProps {
   points?: number;
 }
 
-export const GardenHeader = ({ points = 1240 }: GardenHeaderProps) => {
+export const GardenHeader = ({ points = 0 }: GardenHeaderProps) => {
   return (
     <header className="flex justify-between items-center mb-16">
       <motion.div
@@ -18,7 +18,7 @@ export const GardenHeader = ({ points = 1240 }: GardenHeaderProps) => {
         <h1 className="zen-header-title">
           Zen <span className="text-emerald-500 font-normal">Garden</span>
         </h1>
-        <p className="zen-header-subtitle">Welcome back, your garden is breathing.</p>
+        <p className="zen-header-subtitle">Welcome back, your garden is breathing</p>
       </motion.div>
 
       <div className="flex items-center gap-6">

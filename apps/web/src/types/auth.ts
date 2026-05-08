@@ -16,3 +16,7 @@ export interface SignUpData {
 export interface SignInData {
   signIn: AuthPayload;
 }
+
+export interface GetMe {
+  getMe: User;
+}

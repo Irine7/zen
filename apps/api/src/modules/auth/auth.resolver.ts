@@ -16,6 +16,22 @@ export class AuthResolver {
 		@Arg("name", () => String, { nullable: true }) name: string | undefined,
 		@Ctx() { res }: Context
 	): Promise<AuthPayload> {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+
+		if (!password) {
+			throw new Error("Пароль не может быть пустым");
+		}
+		if (!passwordRegex.test(password)) {
+			throw new Error("Пароль должен быть не менее 8 символов, содержать как минимум одну цифру и один специальный символ");
+		}
+		if (!emailRegex.test(email)) {
+			throw new Error("Неверный формат email");
+		}
+		if (email) {
+			const user = await prisma.user.findUnique({ where: { email } });
+			if (user) throw new Error("Пользователь с таким email уже существует");
+		}
 		// Шифруем пароль
 		const hashedPassword = await bcrypt.hash(password, 10);
 

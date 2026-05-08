@@ -8,14 +8,7 @@ import { GardenHeader } from './GardenHeader';
 import { BackgroundGlow } from '@/src/components/ui/BackgroundGlow';
 import { PlantTreeButton } from './PlantTreeButton';
 import { UserProfileData } from '@/src/types/user';
-
-interface GetMe {
-	getMe: {
-		id: string;
-		email: string;
-		name: string;
-	};
-}
+import { GetMe } from '@/src/types/auth';
 
 // Компонент GardenContent обрабатывает загрузку и отображение сада
 // Он должен быть обернут в AuthGuard
@@ -45,7 +38,7 @@ export const GardenContent = () => {
 		<div className="zen-layout">
 			<BackgroundGlow />
 			<div className="zen-container">
-				<GardenHeader points={userData?.getUserProfile.zenPoints || 0} />
+				<GardenHeader points={userData?.getUserProfile.zenPoints} />
 				<main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 					{gardenData?.getGarden.map((bonsai, index) => (
 						<BonsaiCard key={bonsai.id} bonsai={bonsai} index={index} />

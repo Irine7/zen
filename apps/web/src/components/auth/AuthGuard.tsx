@@ -4,20 +4,13 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { useRouter } from 'next/navigation';
 import { GET_ME } from '@/src/graphql/queries';
+import { GetMe } from '@/src/types/auth';
 
 // Компонент AuthGuard (Proxy) защищает маршруты от неавторизованного доступа.
 // Он проверяет наличие токена в localStorage и перенаправляет на /login при отсутствии.
 
 interface AuthGuardProps {
 	children: React.ReactNode;
-}
-
-interface GetMe {
-	getMe: {
-		id: string;
-		email: string;
-		name: string;
-	};
 }
 
 export const AuthGuard = ({ children }: AuthGuardProps) => {
