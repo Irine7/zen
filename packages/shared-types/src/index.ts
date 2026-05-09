@@ -29,6 +29,12 @@ export const BONSAI_RULES = {
   SICK_THRESHOLD_MS: 3 * 24 * 60 * 60 * 1000,     // 3 дня
 };
 
+// --- Константы аутентификации ---
+export const AUTH_REGEX = {
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  PASSWORD: /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/,
+};
+
 // --- Коды ошибок ---
 export enum ErrorCode {
   NOT_FOUND = "NOT_FOUND",

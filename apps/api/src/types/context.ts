@@ -1,7 +1,7 @@
-import { IncomingMessage, ServerResponse } from "http";
+import type { Request, Response } from "express";
 
 export interface Context {
 	userId?: string;
-	req?: IncomingMessage;
-	res?: ServerResponse;
+	req: Request;
+	res: Response;
 }
