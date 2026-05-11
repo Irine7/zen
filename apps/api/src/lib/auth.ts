@@ -61,39 +61,39 @@ export const setAuthTokens = async (res: express.Response, user: { id: string; e
 		{ userId: user.id, email: user.email },
 		process.env.JWT_SECRET as string,
 		{ expiresIn: "7d" }
-	)
+	);
 
 	// Сохраняем Refresh Token в БД
-	 await prisma.refreshToken.create({
-    data: {
-      token: refreshToken,
-      userId: user.id,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // через 7 дней
-    },
-  });
+	await prisma.refreshToken.create({
+		data: {
+			token: refreshToken,
+			userId: user.id,
+			expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // через 7 дней
+		},
+	});
 
 	// Устанавливаем куки
-  	// Access Token - для запросов в API
+	// Access Token - для запросов в API
 	res.setHeader("Set-Cookie", [
-    cookie.serialize("auth_token", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 15,
-        path: "/",
-    }),
-    // Refresh Token - для обновления сессии
-    cookie.serialize("refresh_token", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
-    })
-]);
+		cookie.serialize("auth_token", accessToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			maxAge: 60 * 15,
+			path: "/",
+		}),
+		// Refresh Token - для обновления сессии
+		cookie.serialize("refresh_token", refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			maxAge: 60 * 60 * 24 * 7,
+			path: "/",
+		})
+	]);
 
-	return { accessToken, refreshToken }
-}
+	return { accessToken, refreshToken };
+};
 
 export const validateAuthInput = async (password: string, email: string, name?: string) => {
 
