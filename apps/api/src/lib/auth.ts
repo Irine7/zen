@@ -39,7 +39,7 @@ export const createContext = async ({ req, res }: { req: express.Request; res: e
 
 	if (token) {
 		try {
-			const payload = jwt.verify(token, process.env.JWT_SECRET as string, { algorithms: ["HS256"] }) as { userId: string; };
+			const payload = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string; };
 			return { userId: payload.userId, req, res };
 		} catch (error) {
 			console.error("JWT Verification failed", error);
@@ -53,60 +53,61 @@ export const setAuthTokens = async (res: express.Response, user: { id: string; e
 	const accessToken = jwt.sign(
 		{ userId: user.id, email: user.email },
 		process.env.JWT_SECRET as string,
-		{ expiresIn: "15m", algorithm: "HS256" }
+		{ expiresIn: "15m" }
 	);
 
 	// Генерируем Refresh Token (долгий - 7 дней)
 	const refreshToken = jwt.sign(
 		{ userId: user.id, email: user.email },
 		process.env.JWT_SECRET as string,
-		{ expiresIn: "7d", algorithm: "HS256" }
-	);
+		{ expiresIn: "7d" }
+	)
 
 	// Сохраняем Refresh Token в БД
 	await prisma.refreshToken.create({
-		data: {
-			token: refreshToken,
-			userId: user.id,
-			expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // через 7 дней
-		},
-	});
+    data: {
+      token: refreshToken,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // через 7 дней
+    },
+  });
 
 	// Устанавливаем куки
-	// Access Token - для запросов в API
+  	// Access Token - для запросов в API
 	res.setHeader("Set-Cookie", [
-		cookie.serialize("auth_token", accessToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			maxAge: 60 * 15,
-			path: "/",
-		}),
-		// Refresh Token - для обновления сессии
-		cookie.serialize("refresh_token", refreshToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			maxAge: 60 * 60 * 24 * 7,
-			path: "/",
-		})
-	]);
+    cookie.serialize("auth_token", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 15,
+        path: "/",
+    }),
+    // Refresh Token - для обновления сессии
+    cookie.serialize("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+    })
+]);
 
-	return { accessToken, refreshToken };
-};
+	return { accessToken, refreshToken }
+}
 
-export const validateAuthInput = async (password: string, email: string, name?: string) => {
-
+export const validateAuthInput = async (password: string, email: string, isSignUp?: boolean) => {
 	if (!password) {
 		throw new Error("Пароль не может быть пустым");
-	}
-	if (!AUTH_REGEX.PASSWORD.test(password)) {
-		throw new Error("Пароль должен быть не менее 8 символов, содержать как минимум одну цифру и один специальный символ");
 	}
 	if (!AUTH_REGEX.EMAIL.test(email)) {
 		throw new Error("Неверный формат email");
 	}
-	if (email) {
+	if (isSignUp) {
+		if (!AUTH_REGEX.PASSWORD.test(password)) {
+			throw new Error("Пароль должен быть не менее 8 символов, содержать как минимум одну цифру и один специальный символ");
+		}
+	}
+	if (isSignUp) {
 		const user = await prisma.user.findUnique({ where: { email } });
 		if (user) throw new Error("Пользователь с таким email уже существует");
 	}

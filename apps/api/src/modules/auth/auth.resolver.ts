@@ -17,7 +17,7 @@ export class AuthResolver {
 		@Arg("name", () => String, { nullable: true }) name: string | undefined,
 		@Ctx() { res }: Context
 	): Promise<AuthPayload> {
-		await validateAuthInput(password, email, name);
+		await validateAuthInput(password, email, true);
 
 		// Шифруем пароль
 		const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,7 +44,7 @@ export class AuthResolver {
 		@Arg("password", () => String) password: string,
 		@Ctx() { res }: Context // Достаем res из контекста
 	): Promise<AuthPayload> {
-		await validateAuthInput(password, email);
+		await validateAuthInput(password, email, false);
 
 		const user = await prisma.user.findUnique({ where: { email } });
 		if (!user) throw new Error("Пользователь не найден");
