@@ -89,7 +89,7 @@ export class AuthResolver {
 
 		try {
 			// Проверяем JWT подпись
-			const payload = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string, email: string; };
+			const payload = jwt.verify(token, process.env.JWT_SECRET as string, { algorithms: ["HS256"] }) as { userId: string; };
 			// Ищем токен в базе данных
 			const savedToken = await prisma.refreshToken.findUnique({
 				where: {

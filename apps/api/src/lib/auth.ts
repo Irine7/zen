@@ -39,7 +39,7 @@ export const createContext = async ({ req, res }: { req: express.Request; res: e
 
 	if (token) {
 		try {
-			const payload = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string; };
+			const payload = jwt.verify(token, process.env.JWT_SECRET as string, { algorithms: ["HS256"] }) as { userId: string; };
 			return { userId: payload.userId, req, res };
 		} catch (error) {
 			console.error("JWT Verification failed", error);
@@ -53,14 +53,14 @@ export const setAuthTokens = async (res: express.Response, user: { id: string; e
 	const accessToken = jwt.sign(
 		{ userId: user.id, email: user.email },
 		process.env.JWT_SECRET as string,
-		{ expiresIn: "15m" }
+		{ expiresIn: "15m", algorithm: "HS256" }
 	);
 
 	// Генерируем Refresh Token (долгий - 7 дней)
 	const refreshToken = jwt.sign(
 		{ userId: user.id, email: user.email },
 		process.env.JWT_SECRET as string,
-		{ expiresIn: "7d" }
+		{ expiresIn: "7d", algorithm: "HS256" }
 	);
 
 	// Сохраняем Refresh Token в БД
