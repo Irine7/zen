@@ -130,3 +130,9 @@ export const GET_ME = gql`
 		}
 	}
 `;
+
+export const LOGOUT = gql`
+	mutation Logout {
+		logout
+	}
+`;
