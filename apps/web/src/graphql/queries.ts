@@ -87,7 +87,7 @@ export const bonsaiFragment = gql`
     id type level lastWateredAt user { id zenPoints }
   }`;
 
-	export const GET_USER_PROFILE = gql`
+export const GET_USER_PROFILE = gql`
 query GetUserProfile($id: String!) {
 	getUserProfile(id: $id) {
 		id
@@ -148,4 +148,16 @@ export const REFRESH_TOKEN = gql`
 			}
 		}
 	}
+`;
+
+export const FORGOT_PASSWORD = gql`
+  mutation ForgotPassword($email: String!) {
+    forgotPassword(email: $email)
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($token: String!, $password: String!) {
+    resetPassword(token: $token, password: $password)
+  }
 `;

@@ -21,6 +21,7 @@ model User {
   bonsais    Bonsai[]
   habits     Habit[]
   refreshTokens RefreshToken[]
+	passwordResetTokens PasswordResetToken[]
   
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -61,6 +62,15 @@ model Bonsai {
 }
 
 model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String

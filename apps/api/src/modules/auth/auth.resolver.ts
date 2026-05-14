@@ -7,6 +7,7 @@ import type { Context } from "@/types/context";
 import { AuthPayload } from "./auth.entity";
 import { setAuthTokens, validateAuthInput } from '@/lib/auth';
 import { GraphQLError } from 'graphql';
+import { randomBytes } from 'crypto';
 
 @Resolver()
 export class AuthResolver {
@@ -119,5 +120,70 @@ export class AuthResolver {
 			console.error("Refresh token error:", error);
 			throw new GraphQLError('Authentication failed', { extensions: { code: 'UNAUTHENTICATED' } });
 		}
+	}
+
+	@Mutation(() => Boolean)
+	async forgotPassword(
+		@Arg("email", () => String) email: string): Promise<boolean> {
+		// Ищем пользователя
+		const user = await prisma.user.findUnique({ where: { email } });
+		// Если пользователя нет — по соображениям безопасности мы всё равно возвращаем true, чтобы злоумышленник не мог «перебирать» существующие email'ы.
+		if (!user) return true;
+
+		// Генерируем токен с маленьким сроком жизни (15 минут)
+		const token = randomBytes(32).toString("hex");
+		const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+		// Сохраняем в PasswordResetToken
+		await prisma.passwordResetToken.create({
+			data: {
+				token,
+				expiresAt,
+				userId: user.id
+			}
+		});
+
+		// Имитируем отправку письма
+		console.log(`--- EMAIL MOCK ---`);
+		console.log(`To: ${email}`);
+		console.log(`Link: http://localhost:3000/reset-password?token=${token}`);
+		console.log(`------------------`);
+		return true;
+	}
+
+	@Mutation(() => Boolean)
+	async resetPassword(
+		@Arg("token", () => String) token: string,
+		@Arg("password", () => String) password: string,
+		@Ctx() { res }: Context
+	): Promise<boolean> {
+		// Находим токен в базе
+		const resetToken = await prisma.passwordResetToken.findUnique({
+			where: { token }
+		});
+		if (!resetToken || resetToken.expiresAt < new Date()) {
+			throw new Error("Токен не найден или устарел");
+		}
+		// Шифруем новый пароль
+		const hashedPassword = await bcrypt.hash(password, 10);
+
+		// Обновляем пароль пользователя и удаляем токен сброса
+		await prisma.$transaction(async (tx) => {
+			await tx.user.update({
+				where: { id: resetToken.userId },
+				data: { password: hashedPassword }
+			});
+
+			await tx.passwordResetToken.delete({
+				where: { token }
+			});
+		});
+
+		// Можно залогировать пользователя (опционально)
+		const user = await prisma.user.findUnique({ where: { id: resetToken.userId } });
+		if (user) {
+			await setAuthTokens(res, user);
+		}
+		return true;
 	}
 }
