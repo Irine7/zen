@@ -6,6 +6,7 @@ import { Resolver, Mutation, Arg, Ctx } from "type-graphql";
 import type { Context } from "@/types/context";
 import { AuthPayload } from "./auth.entity";
 import { setAuthTokens, validateAuthInput } from '@/lib/auth';
+import { GraphQLError } from 'graphql';
 
 @Resolver()
 export class AuthResolver {
@@ -81,11 +82,11 @@ export class AuthResolver {
 		@Ctx() { res }: Context
 	): Promise<AuthPayload> {
 		const cookieHeader = res?.req?.headers?.cookie;
-		if (!cookieHeader) throw new Error('No cookies found');
+		if (!cookieHeader) throw new GraphQLError('No cookies found', { extensions: { code: 'UNAUTHENTICATED' } });
 
 		const cookies = cookie.parse(cookieHeader);
 		const token = cookies.refresh_token;
-		if (!token) throw new Error('Refresh token not found');
+		if (!token) throw new GraphQLError('Refresh token not found', { extensions: { code: 'UNAUTHENTICATED' } });
 
 		try {
 			// Проверяем JWT подпись
@@ -116,7 +117,7 @@ export class AuthResolver {
 			};
 		} catch (error) {
 			console.error("Refresh token error:", error);
-			throw new Error('Authentication failed');
+			throw new GraphQLError('Authentication failed', { extensions: { code: 'UNAUTHENTICATED' } });
 		}
 	}
 }

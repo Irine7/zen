@@ -10,6 +10,7 @@ import { UserService } from '../user/user.service';
 import { HabitService } from '../habit/habit.service';
 import { BonsaiService } from './bonsai.service';
 import type { Context } from '@/types/context';
+import { GraphQLError } from "graphql";
 
 // Создаем Union Type. Результат полива — это ЛИБО дерево, ЛИБО ошибка
 export const BonsaiResult = createUnionType({
@@ -52,7 +53,7 @@ export class BonsaiResolver {
 	@Query(() => [Bonsai])
 	async getGarden(@Ctx() ctx: Context): Promise<Bonsai[]> {
 		if (!ctx.userId) {
-			throw new Error("Пожалуйста, авторизуйтесь");
+			throw new GraphQLError("Пожалуйста, авторизуйтесь", { extensions: { code: 'UNAUTHENTICATED' } });
 		}
 		return prisma.bonsai.findMany({
 			where: {
@@ -108,7 +109,7 @@ export class BonsaiResolver {
 		@Ctx() ctx: Context
 	): Promise<Bonsai> {
 		if (!ctx.userId) {
-			throw new Error("Вы не авторизованы!");
+			throw new GraphQLError("Вы не авторизованы!", { extensions: { code: 'UNAUTHENTICATED' } });
 		}
 		return prisma.bonsai.create({
 			data: {

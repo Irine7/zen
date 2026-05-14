@@ -1,5 +1,5 @@
 import { Mutation, Arg, Resolver, createUnionType } from 'type-graphql';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@/generated/prisma';
 import { Habit } from './habit.entity';
 import { HabitService } from './habit.service';
 import { isBonsaiDead } from '../bonsai/logic';
