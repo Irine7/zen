@@ -1,4 +1,6 @@
 import bcrypt from "bcrypt";
+import { randomBytes } from 'crypto';
+import { GraphQLError } from 'graphql';
 import * as cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
@@ -6,8 +8,6 @@ import { Resolver, Mutation, Query, Arg, Ctx } from "type-graphql";
 import type { Context } from "@/types/context";
 import { AuthPayload } from "./auth.entity";
 import { setAuthTokens, validateAuthInput } from '@/lib/auth';
-import { GraphQLError } from 'graphql';
-import { randomBytes } from 'crypto';
 
 @Resolver()
 export class AuthResolver {
@@ -20,9 +20,12 @@ export class AuthResolver {
 		@Ctx() { res }: Context
 	): Promise<AuthPayload> {
 		await validateAuthInput(password, email, true);
-
 		// Шифруем пароль
 		const hashedPassword = await bcrypt.hash(password, 10);
+
+		// Генерируем токен верификации email
+		const verificationToken = randomBytes(32).toString("hex");
+		const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 часа
 
 		// Создаем пользователя в базе
 		const user = await prisma.user.create({
@@ -30,8 +33,20 @@ export class AuthResolver {
 				email,
 				password: hashedPassword,
 				name: name || "User",
+				emailVerified: false,
+				emailVerificationToken: {
+					create: {
+						token: verificationToken,
+						expiresAt: expiresAt,
+					}
+				}
 			}
 		});
+
+		console.log(`--- EMAIL VERIFICATION MOCK ---`);
+		console.log(`To: ${email}`);
+		console.log(`Link: http://localhost:3000/verify-email?token=${verificationToken}`);
+		console.log(`---------------------------------`);
 
 		// Создаем JWT токен
 		const { accessToken } = await setAuthTokens(res, user);
@@ -184,6 +199,35 @@ export class AuthResolver {
 		if (user) {
 			await setAuthTokens(res, user);
 		}
+		return true;
+	}
+
+	@Mutation(() => Boolean)
+	async verifyEmailToken(
+		@Arg("token", () => String) token: string,
+	): Promise<boolean> {
+		// Ищем токен в БД
+		const verificationToken = await prisma.emailVerificationToken.findUnique({
+			where: { token },
+			include: { user: true }
+		});
+
+		if (!verificationToken || verificationToken.expiresAt < new Date()) {
+			throw new GraphQLError('Токен не найден или устарел', { extensions: { code: 'UNAUTHENTICATED' } });
+		}
+
+		// Если все хорошо, обновляем статус юзера и удаляем токен
+		await prisma.$transaction(async (tx) => {
+			await tx.user.update({
+				where: { id: verificationToken.userId },
+				data: { emailVerified: true }
+			});
+
+			await tx.emailVerificationToken.delete({
+				where: { token }
+			});
+		});
+
 		return true;
 	}
 

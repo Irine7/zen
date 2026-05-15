@@ -167,3 +167,9 @@ export const VERIFY_RESET_TOKEN = gql`
 		verifyResetToken(token: $token)
 	}
 `;
+
+export const VERIFY_EMAIL_TOKEN = gql`
+	mutation VerifyEmailToken($token: String!) {
+		verifyEmailToken(token: $token)
+	}
+`;

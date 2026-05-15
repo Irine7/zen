@@ -24,3 +24,7 @@ export interface GetMe {
 export interface VerifyResetToken {
 	verifyResetToken: boolean;
 }
+
+export interface VerifyEmailToken {
+	verifyEmailToken: boolean;
+}

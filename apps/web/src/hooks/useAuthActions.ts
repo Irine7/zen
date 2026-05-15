@@ -1,9 +1,9 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useApolloClient } from '@apollo/client/react';
-import { LOGOUT, FORGOT_PASSWORD, RESET_PASSWORD, VERIFY_RESET_TOKEN } from '@/src/graphql/queries';
+import { LOGOUT, FORGOT_PASSWORD, RESET_PASSWORD, VERIFY_RESET_TOKEN, VERIFY_EMAIL_TOKEN } from '@/src/graphql/queries';
 import { AUTH_REGEX } from '@zen/shared-types';
-import { VerifyResetToken } from '@/src/types/auth';
+import { VerifyResetToken, VerifyEmailToken } from '@/src/types/auth';
 
 export const useAuthActions = () => {
 	const handleAuthSuccess = () => {
@@ -119,5 +119,39 @@ export const useResetPassword = () => {
 		token,
 		isVerifying: verifying,
 		isTokenValid
+	};
+};
+
+export const useVerifyEmail = () => {
+	const searchParams = useSearchParams();
+	const token = searchParams.get('token');
+
+	const [error, setError] = useState<string | null>(null);
+	const [isVerified, setIsVerified] = useState(false);
+
+	// Проверяем токен при загрузке
+	const [verifyEmail, { loading }] = useMutation<VerifyEmailToken>(VERIFY_EMAIL_TOKEN, {
+		onCompleted: (data) => {
+			if (data.verifyEmailToken) {
+				setIsVerified(true);
+			}
+		},
+		onError: (err) => {
+			setError(err.message);
+		}
+	});
+
+	useEffect(() => {
+		if (token) {
+			verifyEmail({ variables: { token } });
+		} else {
+			setError("Токен подтверждения не найден");
+		}
+	}, [token, verifyEmail]);
+	return {
+		isVerified,
+		loading,
+		error,
+		setError
 	};
 };
