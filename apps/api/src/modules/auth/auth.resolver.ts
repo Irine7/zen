@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import * as cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
-import { Resolver, Mutation, Arg, Ctx } from "type-graphql";
+import { Resolver, Mutation, Query, Arg, Ctx } from "type-graphql";
 import type { Context } from "@/types/context";
 import { AuthPayload } from "./auth.entity";
 import { setAuthTokens, validateAuthInput } from '@/lib/auth';
@@ -185,5 +185,16 @@ export class AuthResolver {
 			await setAuthTokens(res, user);
 		}
 		return true;
+	}
+
+	@Query(() => Boolean)
+	async verifyResetToken(
+		@Arg('token', () => String) token: string
+	): Promise<boolean> {
+		const resetToken = await prisma.passwordResetToken.findUnique({
+			where: { token }
+		});
+		// Возвращаем true только если токен найден и он еще "живой"
+		return !!resetToken && resetToken.expiresAt > new Date();
 	}
 }

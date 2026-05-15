@@ -11,9 +11,19 @@ import { AUTH_REGEX } from '@zen/shared-types';
 import { useResetPassword } from '@/src/hooks/useAuthActions';
 
 export default function ResetPasswordPage() {
-	const { handleSubmit, loading, error, setError, password, setPassword, confirmPassword, setConfirmPassword, token } = useResetPassword();
+	const { handleSubmit, loading, error, setError, password, setPassword, confirmPassword, setConfirmPassword, token, isVerifying, isTokenValid } = useResetPassword();
 
-	if (!token) {
+	if (isVerifying) {
+		return (
+			<AuthLayout title="Verifying" subtitle="Validating your recovery link...">
+				<div className="flex justify-center py-8">
+					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+				</div>
+			</AuthLayout>
+		);
+	}
+
+	if (!token || isTokenValid === false) {
 		return (
 			<AuthLayout title="Invalid Link" subtitle="This password reset link is invalid or has expired">
 				<div className="text-center">

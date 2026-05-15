@@ -1,22 +1,26 @@
 export interface User {
-  id: string;
-  email: string;
-  name: string;
+	id: string;
+	email: string;
+	name: string;
 }
 
 export interface AuthPayload {
-  token: string;
-  user: User;
+	token: string;
+	user: User;
 }
 
 export interface SignUpData {
-  signUp: AuthPayload;
+	signUp: AuthPayload;
 }
 
 export interface SignInData {
-  signIn: AuthPayload;
+	signIn: AuthPayload;
 }
 
 export interface GetMe {
-  getMe: User;
+	getMe: User;
+}
+
+export interface VerifyResetToken {
+	verifyResetToken: boolean;
 }

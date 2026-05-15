@@ -161,3 +161,9 @@ export const RESET_PASSWORD = gql`
     resetPassword(token: $token, password: $password)
   }
 `;
+
+export const VERIFY_RESET_TOKEN = gql`
+	query VerifyResetToken($token: String!) {
+		verifyResetToken(token: $token)
+	}
+`;
