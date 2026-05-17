@@ -23,20 +23,21 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
 
 	useEffect(() => {
 		if (!loading) {
-			if (data?.getMe && !data.getMe.emailVerified) {
-				console.log("Email not verified");
+			if (error || !data?.getMe) {
 				setIsAuthorized(false);
-				if (pathname !== '/verify-email') {
-					router.push("/verify-email");
-					return;
-				}
+				router.push("/login");
+				return;
 			}
 
-			if (error || !data?.getMe) {
-				router.push("/login");
-			} else {
-				setIsAuthorized(true);
+			if (!data.getMe.emailVerified) {
+				setIsAuthorized(pathname === '/verify-email');
+				if (pathname !== '/verify-email') {
+					router.push("/verify-email");
+				}
+				return;
 			}
+
+			setIsAuthorized(true);
 		}
 	}, [data, loading, error, router, pathname]);
 
