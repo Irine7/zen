@@ -10,8 +10,8 @@ import { PasswordRequirements } from '@/src/components/auth/PasswordRequirements
 import { AUTH_REGEX } from '@zen/shared-types';
 import { useResetPassword } from '@/src/hooks/useAuthActions';
 
-export default function ResetPasswordPage() {
-	const { handleSubmit, loading, error, setError, password, setPassword, confirmPassword, setConfirmPassword, token, isVerifying, isTokenValid } = useResetPassword();
+function ResetPasswordForm() {
+	const { handleSubmit, loading, error, password, setPassword, confirmPassword, setConfirmPassword, token, isVerifying, isTokenValid } = useResetPassword();
 
 	if (isVerifying) {
 		return (
@@ -79,8 +79,21 @@ export default function ResetPasswordPage() {
 					{loading ? 'Updating...' : 'Update Password'}
 					<ArrowRight size={20} />
 				</button>
-
 			</form>
 		</AuthLayout>
+	);
+}
+
+export default function ResetPasswordPage() {
+	return (
+		<React.Suspense fallback={
+			<AuthLayout title="Loading" subtitle="Loading recovery page...">
+				<div className="flex justify-center py-8">
+					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+				</div>
+			</AuthLayout>
+		}>
+			<ResetPasswordForm />
+		</React.Suspense>
 	);
 }

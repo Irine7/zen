@@ -72,8 +72,20 @@ export class AuthResolver {
 	}
 
 	@Mutation(() => Boolean)
-	async logout(@Ctx() { res }: Context): Promise<boolean> {
-		// Общие настройки для удаления
+	async logout(@Ctx() { req, res }: Context): Promise<boolean> {
+		// 1. Инвалидируем токен в базе данных
+		const cookieHeader = req?.headers?.cookie;
+		if (cookieHeader) {
+			const cookies = cookie.parse(cookieHeader);
+			const token = cookies.refresh_token;
+			if (token) {
+				await prisma.refreshToken.deleteMany({
+					where: { token }
+				});
+			}
+		}
+
+		// 2. Очищаем куки на клиенте
 		const cookieOptions = {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
@@ -93,9 +105,9 @@ export class AuthResolver {
 
 	@Mutation(() => AuthPayload)
 	async refreshToken(
-		@Ctx() { res }: Context
+		@Ctx() { req, res }: Context
 	): Promise<AuthPayload> {
-		const cookieHeader = res?.req?.headers?.cookie;
+		const cookieHeader = req?.headers?.cookie;
 		if (!cookieHeader) throw new GraphQLError('No cookies found', { extensions: { code: 'UNAUTHENTICATED' } });
 
 		const cookies = cookie.parse(cookieHeader);
@@ -131,6 +143,20 @@ export class AuthResolver {
 			};
 		} catch (error) {
 			console.error("Refresh token error:", error);
+			
+			// Очищаем куки в случае ошибки валидации рефреш-токена, чтобы избежать циклов
+			const cookieOptions = {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === "production",
+				sameSite: "lax" as const,
+				maxAge: 0,
+				path: "/",
+			};
+			res?.setHeader("Set-Cookie", [
+				cookie.serialize("auth_token", "", cookieOptions),
+				cookie.serialize("refresh_token", "", cookieOptions),
+			]);
+
 			throw new GraphQLError('Authentication failed', { extensions: { code: 'UNAUTHENTICATED' } });
 		}
 	}
@@ -180,7 +206,7 @@ export class AuthResolver {
 		// Шифруем новый пароль
 		const hashedPassword = await bcrypt.hash(password, 10);
 
-		// Обновляем пароль пользователя и удаляем токен сброса
+		// Обновляем пароль пользователя, удаляем токен сброса и инвалидируем активные сессии
 		await prisma.$transaction(async (tx) => {
 			await tx.user.update({
 				where: { id: resetToken.userId },
@@ -189,6 +215,11 @@ export class AuthResolver {
 
 			await tx.passwordResetToken.delete({
 				where: { token }
+			});
+
+			// Удаляем все рефреш-токены пользователя (разлогиниваем со всех устройств)
+			await tx.refreshToken.deleteMany({
+				where: { userId: resetToken.userId }
 			});
 		});
 

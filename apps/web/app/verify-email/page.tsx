@@ -7,7 +7,7 @@ import { AuthLayout } from '@/src/components/auth/AuthLayout';
 import { useVerifyEmail } from '@/src/hooks/useAuthActions';
 import { useSearchParams } from 'next/navigation';
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
 	const { isVerified, loading, error, resendSuccess, resendLoading, resendVerification } = useVerifyEmail();
 
 	const searchParams = useSearchParams();
@@ -116,5 +116,19 @@ export default function VerifyEmailPage() {
 				</Link>
 			</div>
 		</AuthLayout>
+	);
+}
+
+export default function VerifyEmailPage() {
+	return (
+		<React.Suspense fallback={
+			<AuthLayout title="Loading" subtitle="Whispering to the seeds...">
+				<div className="flex flex-col items-center py-12">
+					<Loader2 className="text-emerald-500 animate-spin" size={48} />
+				</div>
+			</AuthLayout>
+		}>
+			<VerifyEmailContent />
+		</React.Suspense>
 	);
 }
