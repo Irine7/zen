@@ -2,7 +2,6 @@ import { Arg, Query, Resolver, Ctx } from 'type-graphql';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import type { Context } from '@/types/context';
-import { prisma } from '@/lib/prisma';
 
 @Resolver(() => User)
 export class UserResolver {

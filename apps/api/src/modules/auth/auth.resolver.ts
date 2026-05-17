@@ -11,7 +11,6 @@ import { setAuthTokens, validateAuthInput } from '@/lib/auth';
 
 @Resolver()
 export class AuthResolver {
-	// Регистрируемся в системе
 	@Mutation(() => AuthPayload)
 	async signUp(
 		@Arg("email", () => String) email: string,
@@ -54,7 +53,6 @@ export class AuthResolver {
 		return { token: accessToken, user };
 	}
 
-	// Входим в систему
 	@Mutation(() => AuthPayload)
 	async signIn(
 		@Arg("email", () => String) email: string,
@@ -240,5 +238,53 @@ export class AuthResolver {
 		});
 		// Возвращаем true только если токен найден и он еще "живой"
 		return !!resetToken && resetToken.expiresAt > new Date();
+	}
+
+	@Mutation(() => Boolean)
+	async resendVerificationToken(
+		@Ctx() { userId, res }: Context // Забираем userId прямо из доверенного контекста
+	): Promise<boolean> {
+		// Проверяем, авторизован ли пользователь вообще
+		if (!userId) {
+			throw new GraphQLError("Вы должны быть авторизованы!", { extensions: { code: 'UNAUTHENTICATED' } });
+		}
+		// Идем в базу данных и достаем email пользователя по его ID. Теперь мы на 100% уверены, что email принадлежит именно ему
+		const user = await prisma.user.findUnique({ where: { id: userId } });
+		if (!user) throw new GraphQLError("Пользователь не найден!", { extensions: { code: 'UNAUTHENTICATED' } });
+
+		// Проверяем, не верифицирован ли пользователь уже
+		if (user.emailVerified)
+			throw new GraphQLError("Ваш email уже верифицирован", { extensions: { code: 'BAD_USER_INPUT' } });
+
+		// Генерируем новый токен
+		const token = randomBytes(32).toString('hex');
+		const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+		// Обновляем/создаем токен в базе данных
+		await prisma.user.update({
+			where: { id: userId },
+			data: {
+				emailVerificationToken: {
+					upsert: {
+						update: {
+							token,
+							expiresAt
+						},
+						create: {
+							token,
+							expiresAt,
+						}
+					}
+				}
+			}
+		});
+
+		// Имитируем отправку письма
+		console.log(`--- EMAIL MOCK ---`);
+		console.log(`To: ${user.email}`);
+		console.log(`Link: http://localhost:3000/verify-email?token=${token}`);
+		console.log(`------------------`);
+
+		return true;
 	}
 }

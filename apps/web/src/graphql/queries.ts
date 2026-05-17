@@ -127,6 +127,8 @@ export const GET_ME = gql`
 			id
 			email
 			name
+			zenPoints
+			emailVerified
 		}
 	}
 `;
@@ -171,5 +173,11 @@ export const VERIFY_RESET_TOKEN = gql`
 export const VERIFY_EMAIL_TOKEN = gql`
 	mutation VerifyEmailToken($token: String!) {
 		verifyEmailToken(token: $token)
+	}
+`;
+
+export const RESEND_VERIFICATION_TOKEN = gql`
+	mutation ResendVerificationToken {
+		resendVerificationToken
 	}
 `;

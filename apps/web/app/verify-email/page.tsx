@@ -2,14 +2,18 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { CheckCircle2, XCircle, Loader2, ArrowRight, Sparkles } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, ArrowRight, Sparkles, Mail } from 'lucide-react';
 import { AuthLayout } from '@/src/components/auth/AuthLayout';
 import { useVerifyEmail } from '@/src/hooks/useAuthActions';
+import { useSearchParams } from 'next/navigation';
 
 export default function VerifyEmailPage() {
-	const { isVerified, loading, error } = useVerifyEmail();
+	const { isVerified, loading, error, resendSuccess, resendLoading, resendVerification } = useVerifyEmail();
 
-	// 1. СОСТОЯНИЕ ЗАГРУЗКИ (Магическое ожидание)
+	const searchParams = useSearchParams();
+	const token = searchParams.get('token');
+
+	// СОСТОЯНИЕ ЗАГРУЗКИ
 	if (loading) {
 		return (
 			<AuthLayout title="Verifying Email" subtitle="We're validating your digital soul in our garden">
@@ -27,7 +31,40 @@ export default function VerifyEmailPage() {
 		);
 	}
 
-	// 2. УСПЕХ (Момент триумфа)
+	// Показываем экран "Проверьте почту" если токена нет в URL, и нет ошибок
+	if (!token && !error && !isVerified) {
+		return (
+			<AuthLayout title="Verify Your Email" subtitle="A sanctuary requires a verified email">
+				<div className="text-center py-6">
+					<div className="relative inline-flex mb-10">
+						<div className="absolute inset-0 bg-emerald-500/10 blur-2xl rounded-full scale-150"></div>
+						<div className="relative bg-emerald-500/5 border border-emerald-500/10 p-5 rounded-3xl">
+							<Mail className="text-emerald-400" size={56} strokeWidth={1.5} />
+						</div>
+					</div>
+					<p className="text-zinc-400 text-sm leading-relaxed mb-8 max-w-[300px] mx-auto">
+						We have sent a magic link to your email address. Please follow the link in the message to activate your garden.
+					</p>
+					{/* Кнопка повторной отправки */}
+					<button
+						onClick={() => resendVerification()}
+						disabled={resendLoading}
+						className="w-full btn-primary py-4 mb-4 disabled:opacity-50"
+					>
+						{resendLoading ? 'Sending...' : 'Resend Verification Link'}
+					</button>
+					{/* Красивое уведомление об успешной отправке */}
+					{resendSuccess && (
+						<p className="text-emerald-400 text-sm font-medium animate-pulse">
+							A new link has been dispatched! Check your inbox.
+						</p>
+					)}
+				</div>
+			</AuthLayout>
+		);
+	}
+
+	// УСПЕХ
 	if (isVerified) {
 		return (
 			<AuthLayout title="Success!" subtitle="Your garden is ready for growth">

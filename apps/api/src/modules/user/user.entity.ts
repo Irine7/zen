@@ -15,4 +15,7 @@ export class User {
 
 	@Field(() => Int)
 	zenPoints!: number;
+
+	@Field(() => Boolean)
+	emailVerified!: boolean;
 }

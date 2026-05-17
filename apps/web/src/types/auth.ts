@@ -2,6 +2,8 @@ export interface User {
 	id: string;
 	email: string;
 	name: string;
+	zenPoints: number;
+	emailVerified: boolean;
 }
 
 export interface AuthPayload {

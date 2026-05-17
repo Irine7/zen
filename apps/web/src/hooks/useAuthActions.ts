@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useApolloClient } from '@apollo/client/react';
-import { LOGOUT, FORGOT_PASSWORD, RESET_PASSWORD, VERIFY_RESET_TOKEN, VERIFY_EMAIL_TOKEN } from '@/src/graphql/queries';
+import { LOGOUT, FORGOT_PASSWORD, RESET_PASSWORD, VERIFY_RESET_TOKEN, VERIFY_EMAIL_TOKEN, RESEND_VERIFICATION_TOKEN } from '@/src/graphql/queries';
 import { AUTH_REGEX } from '@zen/shared-types';
 import { VerifyResetToken, VerifyEmailToken } from '@/src/types/auth';
 
@@ -128,6 +128,7 @@ export const useVerifyEmail = () => {
 
 	const [error, setError] = useState<string | null>(null);
 	const [isVerified, setIsVerified] = useState(false);
+	const [resendSuccess, setResendSuccess] = useState(false);
 
 	// Проверяем токен при загрузке
 	const [verifyEmail, { loading }] = useMutation<VerifyEmailToken>(VERIFY_EMAIL_TOKEN, {
@@ -141,17 +142,27 @@ export const useVerifyEmail = () => {
 		}
 	});
 
+	const [resendVerificationTokenMutation, { loading: resendLoading }] = useMutation(RESEND_VERIFICATION_TOKEN, {
+		onCompleted: (data) => {
+			setResendSuccess(true);
+			setTimeout(() => setResendSuccess(false), 3000);
+		},
+		onError: (err) => setError(err.message),
+	});
+
 	useEffect(() => {
 		if (token) {
 			verifyEmail({ variables: { token } });
-		} else {
-			setError("Токен подтверждения не найден");
 		}
 	}, [token, verifyEmail]);
+	
 	return {
 		isVerified,
 		loading,
 		error,
-		setError
+		setError,
+		resendSuccess,
+		resendLoading,
+		resendVerification: resendVerificationTokenMutation
 	};
 };
