@@ -5,18 +5,19 @@ import { ApolloServer } from '@apollo/server';
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
-import { expressMiddleware } from '@as-integrations/express4';
+import { expressMiddleware } from '@as-integrations/express5';
 import { BonsaiResolver } from "@/modules/bonsai/bonsai.resolver";
 import { UserResolver } from "@/modules/user/user.resolver";
 import { HabitResolver } from './modules/habit/habit.resolver';
 import { AuthResolver } from './modules/auth/auth.resolver';
+import { ShopResolver } from './modules/shop/shop.resolver';
 import { createContext, authRateLimitProxy } from './lib/auth';
 import type { Context } from './types/context';
 
 async function bootstrap() {
 	// Строим схему из наших резолверов
 	const schema = await buildSchema({
-		resolvers: [BonsaiResolver, HabitResolver, UserResolver, AuthResolver],
+		resolvers: [BonsaiResolver, HabitResolver, UserResolver, AuthResolver, ShopResolver],
 	});
 
 	const app = express();
@@ -38,6 +39,12 @@ async function bootstrap() {
 			credentials: true,
 		}),
 		express.json(),	// Сначала читаем данные запроса...
+		(req, _res, next) => {
+			if (!req.body) {
+				req.body = {};
+			}
+			next();
+		},
 		authRateLimitProxy, // ...затем проверяем их на лимиты
 		expressMiddleware(server, {  // ...и только потом отдаем запрос в Apollo
 			context: createContext,

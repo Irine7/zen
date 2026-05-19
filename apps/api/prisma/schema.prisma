@@ -26,6 +26,7 @@ model User {
   habits     Habit[]
   refreshTokens RefreshToken[]
 	passwordResetTokens PasswordResetToken[]
+	inventory  Inventory[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -89,4 +90,40 @@ model EmailVerificationToken {
   expiresAt DateTime
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Seed {
+  id          String   @id @default(uuid())
+  type        String   @unique // Например: 'PINE', 'MAPLE', 'SAKURA', 'BAMBOO'
+  name        String
+  price       Int      @default(0)
+  description String?
+  
+  // Обратная связь: где это семечко находится в инвентарях пользователей
+  inventory   Inventory[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Inventory {
+  id        String   @id @default(uuid())
+  
+  // Связь с пользователем
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Связь с семечком
+  seedId    String
+  seed      Seed     @relation(fields: [seedId], references: [id], onDelete: Cascade)
+  
+  // Количество купленных семян этого типа у пользователя
+  quantity  Int      @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Уникальный составной индекс: один пользователь может иметь только 
+  // одну запись инвентаря для конкретного типа семечка
+  @@unique([userId, seedId])
 }

@@ -15,7 +15,7 @@ export interface IBonsai {
   createdAt: Date;
 }
 
-export type BonsaiType = 'PINE' | 'MAPLE';
+export type BonsaiType = 'PINE' | 'MAPLE' | 'SAKURA' | 'BAMBOO';
 
 export interface IUser {
   id: string;
