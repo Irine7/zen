@@ -17,3 +17,9 @@ export class InsufficientFundsError {
 	@Field(() => Int)
 	actualPoints!: number;
 }
+
+@ObjectType()
+export class SeedNotInInventoryError {
+	@Field(() => String)
+	message!: string;
+}

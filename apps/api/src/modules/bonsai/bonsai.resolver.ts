@@ -1,4 +1,5 @@
 import { Resolver, Query, Arg, Mutation, FieldResolver, Root, createUnionType, Ctx } from "type-graphql";
+import { GraphQLError } from "graphql";
 import { Bonsai, CreateBonsaiInput } from './bonsai.entity';
 import { prisma } from "@/lib/prisma";
 import { BONSAI_RULES } from "@zen/shared-types";
@@ -6,17 +7,22 @@ import { validateBonsaiAlive } from "./logic";
 import { User } from '../user/user.entity';
 import { Habit } from '../habit/habit.entity';
 import { BonsaiNotFoundError, BonsaiAlreadyDeadError } from "./errors";
+import { SeedNotInInventoryError } from "../shop/errors";
 import { UserService } from '../user/user.service';
 import { HabitService } from '../habit/habit.service';
 import { BonsaiService } from './bonsai.service';
 import type { Context } from '@/types/context';
-import { GraphQLError } from "graphql";
 
 // Создаем Union Type. Результат полива — это ЛИБО дерево, ЛИБО ошибка
 export const BonsaiResult = createUnionType({
 	name: "BonsaiResult", // Имя для схемы GraphQL
 	types: () => [Bonsai, BonsaiNotFoundError, BonsaiAlreadyDeadError] as const, // Возможные варианты
 });
+
+export const PlantBonsaiResult = createUnionType({
+	name: "PlantBonsaiResult",
+	types: () => [Bonsai, SeedNotInInventoryError] as const,
+})
 
 @Resolver(() => Bonsai)
 export class BonsaiResolver {
@@ -103,19 +109,64 @@ export class BonsaiResolver {
 	}
 
 	// Создаем дерево
-	@Mutation(() => Bonsai)
-	async createBonsai(
-		@Arg("input", () => CreateBonsaiInput) input: CreateBonsaiInput,
+	@Mutation(() => PlantBonsaiResult)
+	async plantBonsaiFromInventory(
+		@Arg("seedId", () => String) seedId: string,
+		@Arg("habitId", () => String) habitId: string,
 		@Ctx() ctx: Context
-	): Promise<Bonsai> {
-		if (!ctx.userId) {
+	) {
+		const userId = ctx.userId;
+		if (!userId) {
 			throw new GraphQLError("Вы не авторизованы!", { extensions: { code: 'UNAUTHENTICATED' } });
 		}
-		return prisma.bonsai.create({
-			data: {
-				...input,
-				userId: ctx.userId
+		return prisma.$transaction(async (tx) => {
+			// Проверяем, есть ли семечко в инвентаре
+			const seedInventory = await tx.inventory.findUnique({
+				where:{
+					userId_seedId: {
+						userId: userId,
+						seedId: seedId
+					}
+				},
+				include: { seed: true }
+			});
+
+			// Если семечка нет в инвентаре, возвращаем ошибку
+			if (!seedInventory || seedInventory.quantity <= 0) {
+				return Object.assign(new SeedNotInInventoryError(), 
+				{message: "В вашем инвентаре нет этого семечка"})
 			}
+
+			// Если семечко одно, удаляем запись из инвентаря 
+			if (seedInventory.quantity === 1) {
+				await tx.inventory.delete({
+					where: {
+						id: seedInventory.id
+					}
+				})
+			}
+			// Если семечек несколько, уменьшаем количество
+			else { 
+				await tx.inventory.update({
+					where: {
+						id: seedInventory.id
+					},
+					data: {
+						quantity: { decrement: 1 }
+					} 
+				})
+			}
+
+			// Создаем дерево
+			const newBonsai = await tx.bonsai.create({
+				data: {
+					userId: userId,
+					habitId: habitId,
+					lastWateredAt: new Date(),
+					type: seedInventory.seed.type
+				}
+			})
+			return Object.assign(new Bonsai(), newBonsai);
 		});
 	}
 
