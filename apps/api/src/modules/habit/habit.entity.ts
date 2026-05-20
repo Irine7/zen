@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from "type-graphql";
+import { ObjectType, Field, ID, InputType } from "type-graphql";
 import type { IHabit } from "@zen/shared-types";
 import { Bonsai } from "../bonsai/bonsai.entity";
 
@@ -18,4 +18,13 @@ export class Habit implements IHabit {
 
 	@Field(() => Bonsai, { nullable: true })
 	bonsai?: Bonsai;
+}
+
+@InputType()
+export class CreateHabitInput {
+	@Field(() => String)
+	title!: string;
+
+	@Field(() => String, { nullable: true })
+	description?: string | null;
 }
