@@ -25,6 +25,14 @@ mutation PlantBonsai($seedId: String!, $habitId: String!) {
 }
 `;
 
+export const CREATE_HABIT = gql`
+mutation CreateHabit($input: CreateHabitInput!) {
+	createHabit(input: $input) {
+		id
+		title}
+}
+`;
+
 export const WATER_BONSAI = gql`
 	mutation WaterBonsai($id: String!) {
 		waterBonsai(id: $id) {
