@@ -7,7 +7,7 @@ import { HabitAlreadyCompletedError, HabitNotFoundError } from './errors';
 import { BonsaiAlreadyDeadError, BonsaiNotFoundError } from '../bonsai/errors';
 
 export class HabitService {
-	// Находит привычку по ID или выбрасывает GraphQLError
+	// Находим привычку по ID или выбрасываем GraphQLError
 	static async getByIdOrThrow(id: string): Promise<Habit> {
 		const habit = await prisma.habit.findUnique({ where: { id } });
 		if (!habit) {
@@ -16,7 +16,7 @@ export class HabitService {
 		return habit;
 	}
 
-	// Находит дерево с привязанной привычкой
+	// Находим привычку с деревом
 	static async getWithBonsai(id: string) {
 		return prisma.habit.findUnique({
 			where: { id },
@@ -24,6 +24,7 @@ export class HabitService {
 		});
 	}
 
+	// Создаем новую привычку
 	static async create(input: CreateHabitInput, userId: string) {
 		return prisma.habit.create({
 			data: {
@@ -34,6 +35,7 @@ export class HabitService {
 		});
 	}
 
+	// Выполняем привычку
 	static async complete(id: string) {
 		// Ищем привычку вместе с деревом
 		const habitWithBonsai = await HabitService.getWithBonsai(id);

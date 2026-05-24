@@ -47,9 +47,9 @@ export function useBonsaiActions(bonsai?: ExtendedBonsai) {
 				}
 			});
 		},
-		createBonsai: async (type: string, habitId: string, userId: string) => {
+		createBonsai: async (seedId: string, habitId: string) => {
 			return createMutation({
-				variables: { input: { type, habitId, userId } },
+				variables: { seedId, habitId },
 				successMessage: "Создано!"
 			});
 		},

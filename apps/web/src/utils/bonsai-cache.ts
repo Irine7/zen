@@ -1,11 +1,12 @@
 import { ApolloCache } from '@apollo/client';
-import { CreateBonsaiData } from '@/src/types/garden';
+import { PlantBonsaiData } from '@/src/types/garden';
 import { bonsaiFragment } from '@/src/graphql/queries';
 import { DeleteBonsaiData } from '@/src/types/garden';
 
-export const handleBonsaiCreate = (cache: ApolloCache, { data }: { data?: CreateBonsaiData; }) => {
-	const newBonsai = data?.createBonsai;
-	if (!newBonsai) return;
+export const handleBonsaiCreate = (cache: ApolloCache, { data }: { data?: PlantBonsaiData; }) => {
+	const newBonsai = data?.plantBonsaiFromInventory;
+	// Если мутация вернула ошибку, а не Bonsai — ничего не добавляем в кэш
+	if (!newBonsai || newBonsai.__typename !== 'Bonsai') return;
 
 	cache.modify({
 		fields: {

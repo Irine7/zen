@@ -3,11 +3,11 @@ import { Loader, Star } from "lucide-react";
 import { ANIMATIONS } from '@/src/constants/animations';
 import { useBonsaiActions } from '@/src/hooks/useBonsaiActions';
 
-export function PlantTreeButton() {
+export function PlantTreeButton({seedId, habitId}: {seedId: string, habitId: string}) {
 	const { createBonsai, loading } = useBonsaiActions();
 
 	const handleClick = async () => {
-		await createBonsai("PINE", "l3", "1");
+		await createBonsai(seedId, habitId);
 	}
 
 	return (

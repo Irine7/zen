@@ -28,8 +28,9 @@ export interface DeleteBonsaiData {
 	};
 }
 
-export interface CreateBonsaiData {
-	createBonsai: ExtendedBonsai;
-	__typename: 'Bonsai' | 'BonsaiAlreadyDeadError' | 'BonsaiNotFoundError' | 'HabitNotFoundError';
-	message?: string;
+export interface PlantBonsaiData {
+	plantBonsaiFromInventory: ExtendedBonsai | {
+		__typename: 'SeedNotInInventoryError';
+		message: string;
+	};
 }

@@ -1,8 +1,9 @@
 import { gql } from '@apollo/client';
 
 export const CREATE_BONSAI = gql`
-mutation CreateBonsai($input: CreateBonsaiInput!) {
-	createBonsai(input: $input) {
+mutation PlantBonsai($seedId: String!, $habitId: String!) {
+	plantBonsaiFromInventory(seedId: $seedId, habitId: $habitId) {
+	__typename
 	... on Bonsai {
 		id
 		type
@@ -16,6 +17,9 @@ mutation CreateBonsai($input: CreateBonsaiInput!) {
 		habit {
 			title
 		}
+	}
+	... on SeedNotInInventoryError {
+		message
 	}
 }
 }
