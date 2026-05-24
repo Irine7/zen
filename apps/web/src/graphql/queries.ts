@@ -86,10 +86,37 @@ export const GET_GARDEN = gql`
 	}
 `;
 
+export const GET_INVENTORY = gql`
+	query GetInventory {
+		getInventory {
+		id
+		quantity
+		seed {
+			id
+			name
+			type
+		}
+		}
+	}
+`;
+
+export const GET_HABITS = gql`
+	query GetHabits {
+		getHabits {
+			id
+			title
+			description
+			bonsai {
+				id
+			}
+		}
+	}
+`;
+
 export const bonsaiFragment = gql`
-  fragment NewBonsai on Bonsai {
-    id type level lastWateredAt user { id zenPoints }
-  }`;
+	fragment NewBonsai on Bonsai {
+		id type level lastWateredAt user { id zenPoints }
+	}`;
 
 export const GET_USER_PROFILE = gql`
 query GetUserProfile($id: String!) {

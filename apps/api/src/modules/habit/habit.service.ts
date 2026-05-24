@@ -24,6 +24,14 @@ export class HabitService {
 		});
 	}
 
+	// Находим все привычки пользователя
+	static async getHabits(userId: string) {
+		return prisma.habit.findMany({
+			where: { userId },
+			include: { bonsai: true }, // Достаем данные из связанной таблицы bonsai
+		});
+	}
+
 	// Создаем новую привычку
 	static async create(input: CreateHabitInput, userId: string) {
 		return prisma.habit.create({

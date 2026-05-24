@@ -17,7 +17,7 @@ export class Habit implements IHabit {
 	userId!: string;
 
 	@Field(() => Bonsai, { nullable: true })
-	bonsai?: Bonsai;
+	bonsai?: Bonsai | null;
 }
 
 @InputType()

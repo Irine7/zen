@@ -1,4 +1,4 @@
-import { Mutation, Arg, Resolver, createUnionType, Ctx } from 'type-graphql';
+import { Mutation, Arg, Resolver, createUnionType, Ctx, Query } from 'type-graphql';
 import { GraphQLError } from "graphql";
 import { CreateHabitInput, Habit } from './habit.entity';
 import { HabitService } from './habit.service';
@@ -30,5 +30,15 @@ export class HabitResolver {
 	@Mutation(() => CompleteHabitResult)
 	async completeHabit(@Arg("id", () => String) id: string) {
 		return await HabitService.complete(id);
+	}
+
+	@Query(() => [Habit]) 
+	async getHabits(@Ctx() ctx: Context): Promise<Habit[]> {
+		if (!ctx.userId) {
+			throw new GraphQLError("Вы не авторизованы!", {
+				extensions: { code: "UNAUTHENTICATED" }
+			});
+		}
+		return HabitService.getHabits(ctx.userId);
 	}
 }
