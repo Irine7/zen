@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from '@apollo/client/react';
 import { BonsaiCard } from './BonsaiCard';
 import { GET_GARDEN, GET_USER_PROFILE, GET_ME } from '@/src/graphql/queries';
@@ -9,10 +10,17 @@ import { BackgroundGlow } from '@/src/components/ui/BackgroundGlow';
 import { PlantTreeButton } from './PlantTreeButton';
 import { UserProfileData } from '@/src/types/user';
 import { GetMe } from '@/src/types/auth';
+import { usePlantTree } from '@/src/hooks/usePlantTree';
+import { Modal } from "../ui/Modal";
+import { PlantTreeForm } from "./PlantTreeForm";
+import { ShopModal } from "./ShopModal";
 
 // Компонент GardenContent обрабатывает загрузку и отображение сада
 // Он должен быть обернут в AuthGuard
 export const GardenContent = () => {
+	const { isModalOpen, setIsModalOpen, inventoryData, inventoryLoading, loading, handlePlant } = usePlantTree();
+	const [isShopModalOpen, setIsShopModalOpen] = useState(false);
+
 	const { data: meData, loading: meLoading, error: meError } = useQuery<GetMe>(GET_ME);
 	const userId = meData?.getMe?.id;
 
@@ -43,8 +51,33 @@ export const GardenContent = () => {
 					{gardenData?.getGarden.map((bonsai, index) => (
 						<BonsaiCard key={bonsai.id} bonsai={bonsai} index={index} />
 					))}
-					<PlantTreeButton />
+					<PlantTreeButton 
+					onClick={() => setIsModalOpen(true)}
+					isCreating={loading.isCreating}
+					/>
 				</main>
+				<Modal 
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+					title="Посадить дерево"
+				>
+					<PlantTreeForm
+						inventoryLoading={inventoryLoading}
+						inventory={inventoryData?.getInventory}
+						isCreating={loading.isCreating}
+						onSubmit={handlePlant}
+						onNavigateToShop={() => {
+							setIsModalOpen(false);
+							setIsShopModalOpen(true);
+						}}
+					/>
+				</Modal>
+				<ShopModal 
+					isOpen={isShopModalOpen} 
+					onClose={() => setIsShopModalOpen(false)} 
+					zenPoints={userData?.getUserProfile.zenPoints} 
+					userId={userId || ""}
+				/>
 			</div>
 		</div>
 	);

@@ -15,6 +15,7 @@ interface PlantTreeFormProps {
   isCreating: boolean;
   // Колбэк ожидает получить название привычки и ID семечка
   onSubmit: (habitTitle: string, selectedSeedId: string) => void;
+  onNavigateToShop: () => void
 }
 
 export function PlantTreeForm({
@@ -22,6 +23,7 @@ export function PlantTreeForm({
   inventory = [],
   isCreating,
   onSubmit,
+  onNavigateToShop,
 }: PlantTreeFormProps) {
     const [habitTitle, setHabitTitle] = useState('');
     const [selectedSeedId, setSelectedSeedId] = useState('');
@@ -44,7 +46,7 @@ export function PlantTreeForm({
           У вас нет семечек. Купите их в магазине!
         </p>
         <button 
-          onClick={() => console.log("Магазин в разработке! Скоро здесь появится полноценная витрина. 😉")}
+          onClick={onNavigateToShop}
           className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 font-medium py-2 px-4 rounded-lg transition-colors text-sm"
         >
           Перейти в магазин

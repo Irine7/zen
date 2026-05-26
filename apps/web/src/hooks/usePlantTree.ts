@@ -14,7 +14,7 @@ interface InventoryItem {
     };
 }
 
-interface InventoryData {
+export interface InventoryData {
     getInventory: InventoryItem[];
 }
 

@@ -25,6 +25,30 @@ mutation PlantBonsai($seedId: String!, $habitId: String!) {
 }
 `;
 
+export const BUY_SEED = gql`
+mutation BuySeed($seedId: String!) {
+	buySeed(seedId: $seedId) {
+	__typename
+	... on Inventory {
+		id
+		quantity
+		seed {
+			id
+			name
+		}
+	}
+	... on SeedNotFoundError {
+		message
+	}
+	... on InsufficientFundsError {
+		message
+		requiredPoints
+		actualPoints
+	}
+}
+}
+`;
+
 export const CREATE_HABIT = gql`
 mutation CreateHabit($input: CreateHabitInput!) {
 	createHabit(input: $input) {
@@ -106,6 +130,18 @@ export const GET_INVENTORY = gql`
 		}
 		}
 	}
+`;
+
+export const GET_SEEDS = gql`	
+	query GetSeeds {
+ 		getSeeds {
+		id
+		type
+		name
+		price
+		description
+	}
+ }
 `;
 
 export const GET_HABITS = gql`
