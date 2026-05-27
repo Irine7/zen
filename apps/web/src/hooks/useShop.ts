@@ -42,7 +42,7 @@ export function useShop(userId?: string) {
 		buySeed,
 		isBuying,
 		seeds,
-        handleBuy
+    handleBuy
 	}
 }
 	

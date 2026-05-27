@@ -34,3 +34,13 @@ export interface PlantBonsaiData {
 		message: string;
 	};
 }
+
+export interface InventoryItem {
+  id: string;
+  quantity: number;
+  seed: {
+	id: string;
+	name: string;
+	type: string;
+  };
+}

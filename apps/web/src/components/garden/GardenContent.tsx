@@ -1,43 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery } from '@apollo/client/react';
+
 import { BonsaiCard } from './BonsaiCard';
-import { GET_GARDEN, GET_USER_PROFILE, GET_ME } from '@/src/graphql/queries';
-import { GetGardenData } from '@/src/types/garden';
 import { GardenHeader } from './GardenHeader';
 import { BackgroundGlow } from '@/src/components/ui/BackgroundGlow';
 import { PlantTreeButton } from './PlantTreeButton';
-import { UserProfileData } from '@/src/types/user';
-import { GetMe } from '@/src/types/auth';
-import { usePlantTree } from '@/src/hooks/usePlantTree';
 import { Modal } from "../ui/Modal";
 import { PlantTreeForm } from "./PlantTreeForm";
 import { ShopModal } from "./ShopModal";
+import { useGarden } from '@/src/hooks/useGarden';
 
 // Компонент GardenContent обрабатывает загрузку и отображение сада
 // Он должен быть обернут в AuthGuard
 export const GardenContent = () => {
-	const { isModalOpen, setIsModalOpen, inventoryData, inventoryLoading, loading, handlePlant } = usePlantTree();
-	const [isShopModalOpen, setIsShopModalOpen] = useState(false);
+	const { 
+        isLoading,
+		error,
+		errorMessage,
+		...otherData
+	} = useGarden();
 
-	const { data: meData, loading: meLoading, error: meError } = useQuery<GetMe>(GET_ME);
-	const userId = meData?.getMe?.id;
-
-	const { data: gardenData, loading: gardenLoading, error: gardenError } = useQuery<GetGardenData>(GET_GARDEN);
-	const { data: userData, loading: userLoading, error: userError } = useQuery<UserProfileData>(GET_USER_PROFILE, {
-		variables: { id: userId || "" },
-		skip: !userId
-	});
-
-	if (meLoading || gardenLoading || userLoading) {
-		return <div className="min-h-screen flex items-center justify-center text-emerald-500">Загрузка сада...</div>;
+	if (isLoading) {
+		return <div className="min-h-screen flex items-center justify-center text-emerald-500">
+			Загрузка сада...
+		</div>;
 	}
 
-	if (meError || gardenError || userError) {
+	if (error) {
 		return (
 			<div className="min-h-screen flex items-center justify-center text-red-500">
-				Ошибка: {meError?.message || gardenError?.message || userError?.message}
+				Ошибка: {errorMessage}
 			</div>
 		);
 	}
@@ -46,37 +38,37 @@ export const GardenContent = () => {
 		<div className="zen-layout">
 			<BackgroundGlow />
 			<div className="zen-container">
-				<GardenHeader points={userData?.getUserProfile.zenPoints} />
+				<GardenHeader points={otherData.userData?.getUserProfile.zenPoints} />
 				<main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-					{gardenData?.getGarden.map((bonsai, index) => (
+					{otherData.gardenData?.getGarden.map((bonsai, index) => (
 						<BonsaiCard key={bonsai.id} bonsai={bonsai} index={index} />
 					))}
 					<PlantTreeButton 
-					onClick={() => setIsModalOpen(true)}
-					isCreating={loading.isCreating}
+					onClick={() => otherData.setIsModalOpen(true)}
+					isCreating={otherData.loading.isCreating}
 					/>
 				</main>
 				<Modal 
-					isOpen={isModalOpen}
-					onClose={() => setIsModalOpen(false)}
+					isOpen={otherData.isModalOpen}
+					onClose={() => otherData.setIsModalOpen(false)}
 					title="Посадить дерево"
 				>
 					<PlantTreeForm
-						inventoryLoading={inventoryLoading}
-						inventory={inventoryData?.getInventory}
-						isCreating={loading.isCreating}
-						onSubmit={handlePlant}
+						inventoryLoading={otherData.inventoryLoading}
+						inventory={otherData.inventoryData?.getInventory}
+						isCreating={otherData.loading.isCreating}
+						onSubmit={otherData.handlePlant}
 						onNavigateToShop={() => {
-							setIsModalOpen(false);
-							setIsShopModalOpen(true);
+							otherData.setIsModalOpen(false);
+							otherData.setIsShopModalOpen(true);
 						}}
 					/>
 				</Modal>
 				<ShopModal 
-					isOpen={isShopModalOpen} 
-					onClose={() => setIsShopModalOpen(false)} 
-					zenPoints={userData?.getUserProfile.zenPoints} 
-					userId={userId || ""}
+					isOpen={otherData.isShopModalOpen} 
+					onClose={() => otherData.setIsShopModalOpen(false)} 
+					zenPoints={otherData.userData?.getUserProfile.zenPoints} 
+					userId={otherData.userId || ""}
 				/>
 			</div>
 		</div>

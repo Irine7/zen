@@ -2,17 +2,7 @@ import { useMutation, useQuery } from '@apollo/client/react';
 import { useState } from 'react';
 import { CREATE_HABIT, GET_INVENTORY } from '../graphql/queries';
 import { useBonsaiActions } from './useBonsaiActions';
-
-
-interface InventoryItem {
-    id: string;
-    quantity: number;
-    seed: {
-        id: string;
-        name: string;
-        type: string;
-    };
-}
+import { InventoryItem } from "@/src/types/garden";
 
 export interface InventoryData {
     getInventory: InventoryItem[];
