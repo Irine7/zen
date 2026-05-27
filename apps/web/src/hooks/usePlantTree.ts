@@ -28,6 +28,9 @@ export function usePlantTree() {
 			}
 			// Сажаем дерево на эту привычку
 			await createBonsai(selectedSeedId, newHabitId);
+
+      setIsModalOpen(false);
+      
 		} catch (error) {
 			console.error("Ошибка при посадке дерева:", error);
 		}

@@ -38,7 +38,10 @@ export const GardenContent = () => {
 		<div className="zen-layout">
 			<BackgroundGlow />
 			<div className="zen-container">
-				<GardenHeader points={otherData.userData?.getUserProfile.zenPoints} />
+				<GardenHeader 
+				points={otherData.userData?.getUserProfile.zenPoints} 
+				onOpenShop={() => otherData.setIsShopModalOpen(true)}
+				/>
 				<main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 					{otherData.gardenData?.getGarden.map((bonsai, index) => (
 						<BonsaiCard key={bonsai.id} bonsai={bonsai} index={index} />
