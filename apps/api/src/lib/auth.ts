@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import type { Context } from "../types/context";
 import { prisma } from './prisma';
 import { AUTH_REGEX } from '@zen/shared-types';
+import { createLoaders } from './dataloaders';
 
 // Лимитер
 export const authLimiter = rateLimit({
@@ -31,6 +32,7 @@ export const authRateLimitProxy = (req: express.Request, res: express.Response, 
 export const createContext = async ({ req, res }: { req: express.Request; res: express.Response; }): Promise<Context> => {
 	const authHeader = req.headers.authorization || "";
 	let token: string | undefined = authHeader.replace("Bearer ", "");
+	const loaders = createLoaders();
 
 	if (!token && req.headers.cookie) {
 		const cookies = cookie.parse(req.headers.cookie);
@@ -40,12 +42,12 @@ export const createContext = async ({ req, res }: { req: express.Request; res: e
 	if (token) {
 		try {
 			const payload = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string; };
-			return { userId: payload.userId, req, res };
+			return { userId: payload.userId, req, res, loaders };
 		} catch (error) {
 			console.error("JWT Verification failed", error);
 		}
 	}
-	return { req, res };
+	return { req, res, loaders };
 };
 
 export const setAuthTokens = async (res: express.Response, user: { id: string; email: string; }) => {

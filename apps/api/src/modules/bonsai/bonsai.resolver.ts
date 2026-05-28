@@ -1,15 +1,11 @@
 import { Resolver, Query, Arg, Mutation, FieldResolver, Root, createUnionType, Ctx } from "type-graphql";
 import { GraphQLError } from "graphql";
-import { Bonsai, CreateBonsaiInput } from './bonsai.entity';
-import { prisma } from "@/lib/prisma";
+import { Bonsai } from './bonsai.entity';
 import { BONSAI_RULES } from "@zen/shared-types";
-import { validateBonsaiAlive } from "./logic";
 import { User } from '../user/user.entity';
 import { Habit } from '../habit/habit.entity';
 import { BonsaiNotFoundError, BonsaiAlreadyDeadError } from "./errors";
 import { SeedNotInInventoryError } from "../shop/errors";
-import { UserService } from '../user/user.service';
-import { HabitService } from '../habit/habit.service';
 import { BonsaiService } from './bonsai.service';
 import type { Context } from '@/types/context';
 
@@ -35,16 +31,30 @@ export class BonsaiResolver {
 		return "HEALTHY";
 	}
 
-	// Связь между деревом и пользователем. Используем UserService для получения данных владельца
+	// Связь между деревом и пользователем. Используем Dataloaders для получения данных владельца
 	@FieldResolver(() => User)
-	async user(@Root() bonsai: Bonsai): Promise<User> {
-		return UserService.getByIdOrThrow(bonsai.userId);
+	async user(
+		@Root() bonsai: Bonsai,
+		@Ctx() ctx: Context
+	): Promise<User> {
+		const user = await ctx.loaders.userLoader.load(bonsai.userId);
+		if (!user) {
+			throw new GraphQLError(`Пользователь с ID ${bonsai.userId} не найден`);
+		}
+		return user;
 	}
 
-	// Связь между деревом и привычкой. Используем HabitService для получения данных привычки
+	// Связь между деревом и привычкой. Используем Dataloaders для получения данных привычки
 	@FieldResolver(() => Habit)
-	async habit(@Root() bonsai: Bonsai): Promise<Habit> {
-		return HabitService.getByIdOrThrow(bonsai.habitId);
+	async habit(
+		@Root() bonsai: Bonsai,
+		@Ctx() ctx: Context
+	): Promise<Habit> {
+		const habit = await ctx.loaders.habitLoader.load(bonsai.habitId);
+		if (!habit) {
+			throw new GraphQLError(`Привычка с ID ${bonsai.habitId} не найдена`);
+		}
+		return habit;
 	}
 
 	// ----------------------- //
